@@ -37,6 +37,7 @@ pipeline {
         stage('Coverage'){
             steps {
                 sh '''
+		  export MAINSERVER="dell-r220-05.cfme.lab.eng.rdu2.redhat.com"
                   source ~/.venv_infrared/bin/activate
 		  cd ~/.venv_infrared/infrared
 		  #Create work space for undercloud deployment
