@@ -1,5 +1,5 @@
 pipeline {
-    agent { node Master }
+    agent { node "Master" }
     stages {
         stage('git_checkout_repo') {
 	  steps {
