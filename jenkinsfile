@@ -26,6 +26,9 @@ pipeline {
 		  pip install --upgrade pip
 		  pip install --upgrade setuptools
 		  cd ~/.venv_infrared
+		  if [ -d "infrared" ] ; then
+    		    rm -rf infrared
+		  fi
  		  git clone https://github.com/redhat-openstack/infrared.git
 		  cd infrared
 		  pip install .
