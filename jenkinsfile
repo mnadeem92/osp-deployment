@@ -19,7 +19,7 @@ pipeline {
         stage('setup_InfraRed_tool') {
             steps {
                 sh '''
-                  sudo yum install -y git gcc libffi-devel openssl-devel python-virtualenv libselinux-python redhat-rpm-config
+                  yum install -y git gcc libffi-devel openssl-devel python-virtualenv libselinux-python redhat-rpm-config
 		  # prepare virtual Environment
 		  virtualenv ~/.venv_infrared
 		  source ~/.venv_infrared/bin/activate
