@@ -23,6 +23,7 @@ pipeline {
 		  # prepare virtual Environment
 		  if [ -d ~/.venv_infrared ] ; then
     		    rm -rf ~/.venv_infrared
+		    rm -rf ~/.infrared
 		  fi
 		  virtualenv ~/.venv_infrared
 		  source ~/.venv_infrared/bin/activate
