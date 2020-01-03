@@ -1,0 +1,40 @@
+---
+- name: Play book to configure and deploy overcloud services 
+- hosts: all
+ 
+  tasks:
+  - name: Ansible check template directory exists.
+    stat:
+     path: /home/stack/templates/
+    register: my_folder
+
+  - name: "echo if directory already existed"
+    debug:
+      msg: "Template directory is already existed"
+    when: my_folder.stat.exists
+ 
+  - name: "Ansible Create directory if not exists"
+    copy:
+      src: templates
+      dest: /home/stack/
+    when: my_folder.stat.exists == false
+ 
+
+  - name: Ansible check if deployment script exists.
+    stat:
+     path: /home/stack/overcloud_deploy.sh
+    register: my_file
+
+  - name: Copy deployment script
+    shell: 'cp  /home/stack/templates/overcloud_deploy.sh  /home/stack/.'
+    mode: 0770 
+    when: my_file.stat.exists == false
+
+  - block:
+        - name: Execute Overcloud Deployment
+          shell: ./home/stack/templates/overcloud_deploy.sh
+          register: execution_status
+
+    rescue:
+        - debug:
+            msg: "{{ execution_status }}"
