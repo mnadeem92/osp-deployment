@@ -1,6 +1,6 @@
 ---
 - name: Play book to configure and deploy overcloud services 
-- hosts: all
+  hosts: all
  
   tasks:
   - name: Ansible check template directory exists.
@@ -26,13 +26,14 @@
     register: my_file
 
   - name: Copy deployment script
-    shell: 'cp  /home/stack/templates/overcloud_deploy.sh  /home/stack/.'
-    mode: 0770 
+    shell: 'cp  /home/stack/templates/overcloud_deploy.sh  /home/stack/. ; chmod 777 /home/stack/overcloud_deploy.sh'
     when: my_file.stat.exists == false
 
   - block:
         - name: Execute Overcloud Deployment
-          shell: ./home/stack/templates/overcloud_deploy.sh
+          shell: ./overcloud_deploy.sh
+          args:
+            chdir: /home/stack/
           register: execution_status
 
     rescue:
