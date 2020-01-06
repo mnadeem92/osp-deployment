@@ -1,0 +1,39 @@
+pipeline {
+    agent { node "Master" }
+    stages {
+        stage('git_checkout_repo') {
+	  steps {
+             checkout(
+            [$class: 'GitSCM',
+            branches: [[name: '*/master']],
+            doGenerateSubmoduleConfigurations: false,
+            extensions: [],
+            submoduleCfg: [],
+            userRemoteConfigs: [
+                [url: 'https://github.com/mnadeem92/osp-deployment.git']
+                ]
+            ]
+        )
+}
+        }
+
+        stage('create inventory'){
+            steps {
+                sh '''
+		  echo $UNDERCLOUD_IP > $WORKSPACE/inventory
+		   '''
+            }
+	
+        stage('install overcloud'){
+                ansiblePlaybook(
+                      credentialsId: 'ssh-key-ansi',
+                      extras: '-l rhv-manager-rhv-ims -e build_url=$BUILD_URL',
+                      installation: 'ansible',
+                      inventory: '$WORKSPACE/inventory',
+                      playbook: '$WORKSPACE/overcloud_deployment.yaml',
+                )
+            }
+
+        
+    }
+}
