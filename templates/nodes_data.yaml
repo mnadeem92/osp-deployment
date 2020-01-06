@@ -1,0 +1,7 @@
+parameter_defaults:
+    ControllerCount: 1
+    OvercloudControlFlavor: control
+    ComputeCount: 2
+    OvercloudComputeFlavor: compute
+    ControllerHostnameFormat: 'controller-%index%'
+    ComputeHostnameFormat: 'compute-%index%'

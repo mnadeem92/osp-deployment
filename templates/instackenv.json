@@ -1,0 +1,47 @@
+{
+    "nodes":[
+        {
+            "mac":[
+                "52:54:00:28:bb:d1"
+            ],
+            "name":"controller",
+            "cpu":"4",
+            "memory":"6144",
+            "disk":"40",
+            "arch":"x86_64",
+            "pm_type":"ipmi",
+            "pm_user":"admin",
+            "pm_port": "6230",
+            "pm_password":"password",
+            "pm_addr":"192.168.24.200"
+        },
+        {
+            "mac":[
+                "ac:1f:6b:ac:48:9d"
+            ],
+            "name":"smicro-5037-05-mm.cfme.lab.eng.rdu2.redhat.com",
+            "cpu":"4",
+            "memory":"6144",
+            "disk":"40",
+            "arch":"x86_64",
+            "pm_type":"ipmi",
+            "pm_user":"ADMIN",
+            "pm_password":"ADMIN",
+            "pm_addr":"smicro-5037-05-mm.cfme.lab.eng.rdu2.redhat.com"
+        },
+        {
+            "mac":[
+                "ac:1f:6b:ac:48:15"
+            ],
+            "name":"smicro-5037-06-mm.cfme.lab.eng.rdu2.redhat.com",
+            "cpu":"4",
+            "memory":"6144",
+            "disk":"40",
+            "arch":"x86_64",
+            "pm_type":"ipmi",
+            "pm_user":"ADMIN",
+            "pm_password":"ADMIN",
+            "pm_addr":"smicro-5037-06-mm.cfme.lab.eng.rdu2.redhat.com"
+        }
+    ]
+}
