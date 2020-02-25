@@ -1,0 +1,84 @@
+pipeline {
+    agent { node "Master" }
+    parameters {string(name: 'TARGET', defaultValue: '', description: 'set default value to ip of MAINSERVER')}
+    stages {
+        stage('git_checkout_repo') {
+	  steps {
+             checkout(
+            [$class: 'GitSCM',
+            branches: [[name: '*/master']],
+            doGenerateSubmoduleConfigurations: false,
+            extensions: [],
+            submoduleCfg: [],
+            userRemoteConfigs: [
+                [url: 'https://gitlab.cee.redhat.com/mnadeem/osp-auto-deploy.git']
+                ]
+            ]
+        )
+}
+        }
+        stage('decrypt_vault_data') {
+            steps {
+                sh '''
+                  cd $WORKSPACE
+                  echo $VAULT_PSW > /tmp/vault_file
+                  ansible-vault decrypt --vault-password-file /tmp/vault_file key_osp key_osp.pub templates/overcloud-cacert.pem templates/enable-tls.yaml templates/inject-trust-anchor.yaml
+                  rm -rf /tmp/vault_file
+                '''
+            }
+        }
+        stage('Set_Host_name') {
+            steps {
+                sh '''
+                  sudo hostnamectl set-hostname $HOST_NAME
+                '''
+            }
+        }
+        stage('Configure_repository'){
+            steps {
+                sh '''
+		  subscription-manager register --auto-attach --username=$SUBS_USER_NAME --password=$SUBS_PSW
+		  subscription-manager repos --enable=rhel-7-server-rpms
+		  subscription-manager repos --enable=rhel-7-server-rh-common-rpms
+		  subscription-manager repos --enable=rhel-7-server-extras-rpms
+		  subscription-manager repos --enable=rhel-7-server-openstack-13-rpms
+		  subscription-manager repos --enable=rhel-7-server-openstack-13-devtools-rpms
+                '''
+            }
+        }
+        stage('Install_OSP_packages') {
+            steps {
+                sh '''
+		  yum install yum-utils   -y
+		  yum install -y openstack-packstack
+                '''
+		    }
+		}
+        stage('Configure_Environment') {
+            steps {
+                sh '''
+		  systemctl stop NetworkManager  
+		  systemctl disable NetworkManager  
+		  packstack --gen-answer-file=~/osp13.packstack
+
+		  sed -i "s/^\(CONFIG_CINDER_VOLUMES_SIZE\s*=\s*\).*\$/\1$CINDER_VOLUME_SIZE/" ~/osp13.packstack
+		  sed -i "s/^\(CONFIG_DEFAULT_PASSWORD\s*=\s*\).*\$/\1Dog8code/" ~/osp13.packstack 
+		  sed -i "s/^\(CONFIG_PANKO_INSTALL\s*=\s*\).*\$/\1y/" ~/osp13.packstack
+		  sed -i "s/^\(CONFIG_HEAT_INSTALL\s*=\s*\).*\$/\1y/" ~/osp13.packstack
+		  sed -i "s/^\(CONFIG_NEUTRON_ML2_TYPE_DRIVERS\s*=\s*\).*\$/\1vxlan,flat,vlan,gre/" ~/osp13.packstack
+		  CONTROLLER_IP=`grep CONFIG_CONTROLLER_HOST ~/osp13.packstack | awk -F"="  '{print $2}'`
+		  CONTROLLER_INTERFACE=`ip -o addr | grep $CONTROLLER_HOST | awk '{print $2}'`
+  		  sed -i "s/^\(CONFIG_NEUTRON_OVS_BRIDGE_IFACES\s*=\s*\).*\$/\1br-ex:$CONTROLLER_INTERFACE/" ~/osp13.packstack
+		  sed -i "s/^\(CONFIG_PROVISION_DEMO\s*=\s*\).*\$/\1n/" ~/osp13.packstack
+                '''
+		    }
+		}
+        stage('Install_OSP') {
+            steps {
+                sh '''
+		  packstack --answer-file=~/osp13.packstack --timeout=900
+                '''
+		    }
+		}
+    }
+}
