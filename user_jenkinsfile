@@ -20,7 +20,7 @@ pipeline {
             steps {
                 sh '''
 		  ls $WORKSPACE
-                  cd $WORKSPACE/osp-deployment
+                  cd $WORKSPACE
                   echo $VAULT_PSW > /tmp/vault_file
                   ansible-vault decrypt --vault-password-file /tmp/vault_file key_osp key_osp.pub
                   rm -rf /tmp/vault_file
