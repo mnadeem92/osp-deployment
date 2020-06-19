@@ -35,6 +35,7 @@ pipeline {
             }
 	
         stage('create user'){
+	  steps {
                 ansiblePlaybook(
                       credentialsId: 'root',
                       extras: '-e NODE_IP=$NODE_IP',
@@ -42,6 +43,7 @@ pipeline {
                       inventory: '$WORKSPACE/inventory',
                       playbook: '$WORKSPACE/create_user.yaml',
                 )
+	      }
             }
 
         
