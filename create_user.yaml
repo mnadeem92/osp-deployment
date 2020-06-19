@@ -1,14 +1,6 @@
 ---
 - hosts: all
   tasks:
-  - include_vars: config_vars.yml
-
-  - name: Set Host name
-    shell:
-      cmd: |
-        hostnamectl set-hostname "{{ host_name }}"
-        hostnamectl set-hostname "{{ host_name }}" --transient
-
   - name: Create stack user
     user: name=stack
     sudo: yes
@@ -23,4 +15,9 @@
     authorized_key:
       user: stack
       state: present
-      key: "{{ lookup('file', 'mdkey.pub') }}"
+      key: "{{ lookup('file', 'key_osp.pub') }}"
+
+  - name: Debug msg
+    copy:
+      dest: "/etc/nadeem"
+      content: "{{ NODE_IP }}"
