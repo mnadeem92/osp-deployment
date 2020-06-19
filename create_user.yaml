@@ -1,0 +1,26 @@
+---
+- hosts: all
+  tasks:
+  - include_vars: config_vars.yml
+
+  - name: Set Host name
+    shell:
+      cmd: |
+        hostnamectl set-hostname "{{ host_name }}"
+        hostnamectl set-hostname "{{ host_name }}" --transient
+
+  - name: Create stack user
+    user: name=stack
+    sudo: yes
+
+  - name: Add stack user to the sudoers
+    copy:
+      dest: "/etc/sudoers.d/stack"
+      content: "stack  ALL=(root)  NOPASSWD: ALL"
+      mode: 0440
+
+  - name: Create stack user and set authorized key
+    authorized_key:
+      user: stack
+      state: present
+      key: "{{ lookup('file', 'mdkey.pub') }}"
